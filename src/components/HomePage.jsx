@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaCheck, FaStar, FaCar, FaPlane, FaBriefcase, FaShieldAlt, FaClock, FaUsers, FaMapMarkerAlt, FaCalendarAlt, FaCheckCircle, FaDollarSign, FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/api';
 
 const HomePage = () => {
   const [cars, setCars] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [team, setTeam] = useState([]);
-  const [services, setServices] = useState([]);
+  const [homeServices, setHomeServices] = useState([]); // Corrected variable name
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState({
@@ -18,129 +18,67 @@ const HomePage = () => {
     totalCars: 50
   });
 
-  // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
-  const USE_API = false; // Set to true if you want to use actual API
-  
-  // Mock data as per your HTML template
-  const mockData = {
-    cars: [
-      {
-        id: 1,
-        category: 'Economy',
-        type: 'Sedan',
-        seats: 4,
-        bags: 2,
-        ac: true,
-        hourlyRate: 400,
-        dailyRate: 3500,
-        image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=300&h=200&fit=crop',
-        description: '4 Seats • 2 Bags • AC'
-      },
-      {
-        id: 2,
-        category: 'SUV',
-        type: 'SUV',
-        seats: 7,
-        bags: 3,
-        ac: true,
-        hourlyRate: 600,
-        dailyRate: 5500,
-        image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=300&h=200&fit=crop',
-        description: '7 Seats • 3 Bags • AC'
-      },
-      {
-        id: 3,
-        category: 'Luxury',
-        type: 'Premium',
-        seats: 4,
-        bags: 3,
-        ac: true,
-        hourlyRate: 900,
-        dailyRate: 8500,
-        image: 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=300&h=200&fit=crop',
-        description: '4 Seats • 3 Bags • Premium AC'
-      }
-    ],
-    
-    testimonials: [
-      {
-        id: 1,
-        name: "Handy Mann",
-        rating: 5,
-        text: "Excellent service! The car was clean and the driver was very professional. Highly recommended for anyone looking for reliable transportation."
-      },
-      {
-        id: 2,
-        name: "Alex Richardson",
-        rating: 5,
-        text: "Great experience from booking to drop-off. The prices are competitive and the service is top-notch. Will definitely use again!"
-      }
-    ],
-    
-    blogs: [
-      {
-        id: 1,
-        title: "New Fleet Addition",
-        date: "25 Jan 2025",
-        image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&h=250&fit=crop",
-        excerpt: "We've added 10 new luxury vehicles to our fleet to serve you better."
-      },
-      {
-        id: 2,
-        title: "Safety First Initiative",
-        date: "20 Jan 2025",
-        image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=250&fit=crop",
-        excerpt: "All our vehicles now equipped with latest safety features and sanitized regularly."
-      },
-      {
-        id: 3,
-        title: "Special Winter Offers",
-        date: "15 Jan 2025",
-        image: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=400&h=250&fit=crop",
-        excerpt: "Book now and get up to 20% off on all weekly and monthly rentals."
-      }
-    ],
-    
-    team: [
-      {
-        id: 1,
-        name: "John Brown",
-        position: "Senior Driver",
-        image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop"
-      },
-      {
-        id: 2,
-        name: "Sarah Johnson",
-        position: "Operations Manager",
-        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop"
-      },
-      {
-        id: 3,
-        name: "Mike Wilson",
-        position: "Customer Support",
-        image: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=300&h=300&fit=crop"
-      }
-    ],
-    
-    services: [
-      {
-        id: 1,
-        title: "City Transfer",
-        description: "Comfortable and reliable transportation within the city for all your needs."
-      },
-      {
-        id: 2,
-        title: "Airport Transfer",
-        description: "Hassle-free pickup and drop services to and from the airport."
-      },
-      {
-        id: 3,
-        title: "Business Travel",
-        description: "Professional transportation solutions for your business meetings."
-      }
-    ]
-  };
+  // Mock data
+  const mockCars = [
+    {
+      id: 1,
+      category: 'Economy',
+      type: 'Sedan',
+      seats: 4,
+      bags: 2,
+      ac: true,
+      hourlyRate: 400,
+      dailyRate: 3500,
+      image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=300&h=200&fit=crop',
+      description: '4 Seats • 2 Bags • AC'
+    },
+    {
+      id: 2,
+      category: 'SUV',
+      type: 'SUV',
+      seats: 7,
+      bags: 3,
+      ac: true,
+      hourlyRate: 600,
+      dailyRate: 5500,
+      image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=300&h=200&fit=crop',
+      description: '7 Seats • 3 Bags • AC'
+    },
+    {
+      id: 3,
+      category: 'Luxury',
+      type: 'Premium',
+      seats: 4,
+      bags: 3,
+      ac: true,
+      hourlyRate: 900,
+      dailyRate: 8500,
+      image: 'https://images.unsplash.com/photo-1563720360172-67b8f3dce741?w=300&h=200&fit=crop',
+      description: '4 Seats • 3 Bags • Premium AC'
+    }
+  ];
+
+  // Mock data for home services
+  const mockHomeServices = [
+    {
+      id: 1,
+      title: "City Transfer",
+      description: "Comfortable and reliable transportation within the city for all your needs.",
+      icon: "car"
+    },
+    {
+      id: 2,
+      title: "Airport Transfer",
+      description: "Hassle-free pickup and drop services to and from the airport.",
+      icon: "plane"
+    },
+    {
+      id: 3,
+      title: "Business Travel",
+      description: "Professional transportation solutions for your business meetings.",
+      icon: "briefcase"
+    }
+  ];
 
   const partners = [
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" },
@@ -163,77 +101,56 @@ const HomePage = () => {
     { icon: <FaCheckCircle size="2em" />, title: "Sit back & Relax", description: "Enjoy your comfortable ride" }
   ];
 
-  // API functions
-  const fetchDataFromAPI = async () => {
-    if (!USE_API) {
-      return {
-        cars: mockData.cars,
-        testimonials: mockData.testimonials,
-        blogs: mockData.blogs,
-        team: mockData.team,
-        services: mockData.services,
-        stats: stats
-      };
-    }
-
-    try {
-      const [carsRes, testimonialsRes, blogsRes, teamRes, servicesRes] = await Promise.all([
-        axios.get(`${API_BASE_URL}/cars`).catch(() => ({ data: mockData.cars })),
-        axios.get(`${API_BASE_URL}/testimonials`).catch(() => ({ data: mockData.testimonials })),
-        axios.get(`${API_BASE_URL}/blogs`).catch(() => ({ data: mockData.blogs })),
-        axios.get(`${API_BASE_URL}/team`).catch(() => ({ data: mockData.team })),
-        axios.get(`${API_BASE_URL}/services`).catch(() => ({ data: mockData.services }))
-      ]);
-
-      return {
-        cars: carsRes.data?.slice(0, 3) || mockData.cars,
-        testimonials: testimonialsRes.data || mockData.testimonials,
-        blogs: blogsRes.data?.slice(0, 3) || mockData.blogs,
-        team: teamRes.data?.slice(0, 3) || mockData.team,
-        services: servicesRes.data?.slice(0, 3) || mockData.services,
-        stats: stats
-      };
-    } catch (error) {
-      console.error('Error fetching from API:', error);
-      return {
-        cars: mockData.cars,
-        testimonials: mockData.testimonials,
-        blogs: mockData.blogs,
-        team: mockData.team,
-        services: mockData.services,
-        stats: stats
-      };
-    }
+  // Icon mapping for home services
+  const homeServiceIcons = {
+    car: <FaCar />,
+    plane: <FaPlane />,
+    briefcase: <FaBriefcase />
   };
 
   useEffect(() => {
-    const loadData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await fetchDataFromAPI();
         
-        setCars(data.cars);
-        setTestimonials(data.testimonials);
-        setBlogs(data.blogs);
-        setTeam(data.team);
-        setServices(data.services);
-        setStats(data.stats);
-        
+        const [
+          carsResponse,
+          testimonialsResponse,
+          blogsResponse,
+          teamResponse,
+          homeServicesResponse, // Changed to homeServices
+          statsResponse
+        ] = await Promise.all([
+          api.getCars().catch(() => ({ data: mockCars })),
+          api.getTestimonials().catch(() => ({ data: [] })),
+          api.getBlogs().catch(() => ({ data: [] })),
+          api.getTeam().catch(() => ({ data: [] })),
+          api.getHomeServices().catch(() => ({ data: mockHomeServices })), // Changed API call
+          api.getStats()
+        ]);
+
+        setCars(carsResponse.data?.slice(0, 3) || mockCars);
+        setTestimonials(testimonialsResponse.data || []);
+        setBlogs(blogsResponse.data?.slice(0, 3) || []);
+        setTeam(teamResponse.data?.slice(0, 3) || []);
+        setHomeServices(homeServicesResponse.data || mockHomeServices); // Corrected
+        setStats(statsResponse.data);
+
         setError(null);
       } catch (err) {
         console.error('Error loading data:', err);
         setError('Failed to load data. Using local data.');
-        setCars(mockData.cars);
-        setTestimonials(mockData.testimonials);
-        setBlogs(mockData.blogs);
-        setTeam(mockData.team);
-        setServices(mockData.services);
+        setCars(mockCars.slice(0, 3));
+        setTestimonials([]);
+        setBlogs([]);
+        setTeam([]);
+        setHomeServices(mockHomeServices); // Corrected
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -247,7 +164,7 @@ const HomePage = () => {
 
   return (
     <>
-      {/* Hero Section - Exact match with HTML */}
+      {/* Hero Section */}
       <section className="hero-section-home" id="home">
         <Container>
           <Row className="align-items-center banner-gap">
@@ -263,7 +180,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Rates Section - Exact match with HTML */}
+      {/* Rates Section */}
       <section className="rates-section" id="rates">
         <Container>
           <h2>Flexible <span className="highlight">Rates</span></h2>
@@ -288,7 +205,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Orange Info Section - Exact match with HTML */}
+      {/* Orange Info Section */}
       <section className="orange-section">
         <Container>
           <Row className="align-items-center">
@@ -306,7 +223,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Why Us Section - Exact match with HTML */}
+      {/* Why Us Section */}
       <section className="why-us-section" id="about">
         <Container>
           <h2 className="text-center">Why <span className="highlight">Us</span></h2>
@@ -349,16 +266,16 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Services Section - Exact match with HTML */}
+      {/* Services Section - UPDATED with homeServices */}
       <section className="services-section-home" id="services" style={{ backgroundColor: '#e9e9e9' }}>
         <Container>
           <h2 className="text-center mb-5" style={{ fontSize: '40px' }}>Our <span className="highlight">Services</span></h2>
           <Row>
-            {services.map((service, index) => (
-              <Col md={4} key={service.id || index} className="mb-4">
+            {homeServices.map((service) => (
+              <Col md={4} key={service.id} className="mb-4">
                 <div className="service-card">
                   <div className="service-icon">
-                    {index === 0 ? <FaCar /> : index === 1 ? <FaPlane /> : <FaBriefcase />}
+                    {homeServiceIcons[service.icon] || <FaCar />}
                   </div>
                   <h4>{service.title}</h4>
                   <p>{service.description}</p>
@@ -369,7 +286,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Partners Section - Exact match with HTML */}
+      {/* Partners Section */}
       <section className="partners text-center bg-light partners-section">
         <Container>
           <h2 className="mb-4">Our Trusted <span className="highlight">Partners</span></h2>
@@ -387,7 +304,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Advantages & How It Works - Exact match with HTML */}
+      {/* Advantages & How It Works */}
       <section className="advantages-section">
         <Container>
           <Row>
@@ -425,7 +342,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Stats Section - Exact match with HTML */}
+      {/* Stats Section */}
       <section className="stats-section">
         <Container>
           <Row>
@@ -451,7 +368,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Team Section - Exact match with HTML */}
+      {/* Team Section */}
       <section className="team-section">
         <Container>
           <h2 className="text-center mb-5">Our <span className="highlight">Team Members</span></h2>
@@ -474,7 +391,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* Testimonials - Exact match with HTML */}
+      {/* Testimonials */}
       <section className="testimonials-section">
         <Container>
           <h2 className="text-center mb-5">Our <span className="highlight">Testimonials</span></h2>
@@ -496,7 +413,7 @@ const HomePage = () => {
         </Container>
       </section>
 
-      {/* News Section - Exact match with HTML */}
+      {/* News Section */}
       <section className="news-section">
         <Container>
           <h2 className="text-center mb-5">News & <span className="highlight">Updates</span></h2>

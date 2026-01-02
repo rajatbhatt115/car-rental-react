@@ -2,15 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaComments, FaCalendar } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/api';
 
 const BlogsPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
 
   // Mock data for blogs
   const mockBlogs = [
@@ -29,34 +26,15 @@ const BlogsPage = () => {
       image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=250&fit=crop",
       excerpt: "All our vehicles now equipped with latest safety features and sanitized regularly.",
       comments: 5
-    },
-    {
-      id: 3,
-      title: "Special Winter Offers",
-      date: "15 Jan 2025",
-      image: "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=400&h=250&fit=crop",
-      excerpt: "Book now and get up to 20% off on all weekly and monthly rentals.",
-      comments: 2
     }
   ];
-
-  // API function to get blogs
-  const getBlogs = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/blogs`);
-      return { data: response.data };
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
-      return { data: mockBlogs };
-    }
-  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await getBlogs();
-        setBlogs(response.data);
+        const response = await api.getBlogs();
+        setBlogs(response.data || mockBlogs);
         setError(null);
       } catch (err) {
         console.error('Error fetching blogs:', err);

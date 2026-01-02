@@ -2,17 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaBullseye, FaLightbulb, FaHandHoldingHeart, FaChevronRight } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/api';
 
 const AboutPage = () => {
   const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
-
-    const timeline = [
+  const timeline = [
     { year: '2020', desc: 'Founded CarRental with just 10 cars and a small but passionate team.' },
     { year: '2021', desc: 'Expanded services to 3 major cities with 24/7 online booking support.' },
     { year: '2022', desc: 'Introduced luxury vehicles and business travel packages.' },
@@ -20,8 +17,24 @@ const AboutPage = () => {
     { year: '2024', desc: 'Launched eco-friendly electric car rentals for sustainable travel.' }
   ];
 
- 
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getTeam();
+        setTeam(response.data || []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching team:', err);
+        setError('Failed to load team data.');
+        setTeam([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchTeam();
+  }, []);
 
   return (
     <>
@@ -169,7 +182,11 @@ const AboutPage = () => {
         </Container>
       </section>
 
-      
+      {error && (
+        <Container>
+          <Alert variant="warning">{error}</Alert>
+        </Container>
+      )}
     </>
   );
 };

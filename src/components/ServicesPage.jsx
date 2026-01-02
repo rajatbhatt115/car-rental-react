@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { FaBan, FaShieldAlt, FaMapMarkerAlt, FaGasPump } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/api';
 import {
   FaCar,
   FaSuitcase,
@@ -18,7 +18,13 @@ const serviceIcons = {
   ship: <FaShip size={52} />,
   beach: <FaUmbrellaBeach size={52} />
 };
-// Updated mock data for services (HTML section ke according)
+
+const ServicesPage = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Mock data for Services Page (as per your HTML template)
   const mockServices = [
     {
       id: 1,
@@ -57,18 +63,6 @@ const serviceIcons = {
     }
   ];
 
-
-const ServicesPage = () => {
-  const [services, setServices] = useState(mockServices);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
-
-  
-
-
   const features = [
     {
       icon: <FaBan size={30} />,
@@ -100,48 +94,42 @@ const ServicesPage = () => {
     { days: "Above 15 Days", discount: "20% Discount" }
   ];
 
-  // API function to get services
-  const getServices = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/services`);
-      return { data: response.data };
-    } catch (error) {
-      console.error('Error fetching services:', error);
-      return { data: mockServices };
-    }
-  };
-
   useEffect(() => {
-  const fetchServices = async () => {
-    try {
-      setLoading(true);
-      const response = await getServices();
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        const response = await api.getServices();
+        
+        // Validate API response
+        const apiData = response.data;
+        
+        if (apiData && apiData.length > 0) {
+          // Ensure each service has proper structure
+          const formattedServices = apiData.map(service => ({
+            id: service.id || Date.now(),
+            number: service.number || `0${service.id}`,
+            title: service.title || "Service",
+            icon: service.icon || "car",
+            description: service.description || "No description available"
+          }));
+          setServices(formattedServices);
+        } else {
+          // Use mock data if API returns empty
+          setServices(mockServices);
+        }
 
-      // 🔥 IMPORTANT FIX HERE
-      const apiData = response.data;
-
-      // agar API ka data ServicesPage ke format ka nahi hai
-      const validServices = apiData?.filter(
-        item => item.number && item.icon
-      );
-
-      if (validServices && validServices.length > 0) {
-        setServices(validServices);
-      } else {
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        setError('Failed to load services. Using local data.');
         setServices(mockServices);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching services:', err);
-      setServices(mockServices);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchServices();
-}, []);
+    fetchServices();
+  }, []);
 
   if (loading && services.length === 0) {
     return (
@@ -177,6 +165,8 @@ const ServicesPage = () => {
         </Container>
       </section>
 
+      {error && <Alert variant="warning" className="mt-3">{error}</Alert>}
+
       {/* Services section */}
       <section className="services-section">
         <Container>
@@ -189,14 +179,14 @@ const ServicesPage = () => {
           <Row className='d-flex justify-content-center'>
             {services.map((service) => (
               <Col lg={4} md={6} key={service.id} className="mb-4">
-                <div className="service-card h-100">
+                <div className="service-card">
 
                   <div className="service-number">
                     {service.number}
                   </div>
 
                   <div className="service-icon text-warning mb-3">
-                    {serviceIcons[service.icon]}
+                    {serviceIcons[service.icon] || <FaCar size={52} />}
                   </div>
 
                   <h3 className="service-title">
@@ -206,7 +196,7 @@ const ServicesPage = () => {
                     </span>
                   </h3>
 
-                  <p>{service.description}</p>
+                  <p style={{ overflow: "visible", whiteSpace: "normal", display: "block", maxHeight: "none", WebkitLineClamp: "unset", WebkitBoxOrient: "unset" }}>{service.description}</p>
 
                 </div>
               </Col>
@@ -215,7 +205,6 @@ const ServicesPage = () => {
 
         </Container>
       </section>
-
 
       {/* CTA Section */}
       <section className="cta-section">
@@ -237,50 +226,50 @@ const ServicesPage = () => {
         </Container>
       </section>
 
-     {/* Pricing Section */}
-<section className="pricing-section">
-  <Container>
-    <h2 className="d-flex justify-content-center align-items-center" style={{gap: "5px"}}>
-      Our <span style={{color: "#ff6b35"}}>Rates</span>
-    </h2>
-    
-    <div className="container mt-4">
-      <Row className="justify-content-center">
-        {/* Left Pricing Card */}
-        <Col lg={4} md={6} className="col-12 mb-4">
-          <div className="pricing-card">
-            <span className="discount-badge">Save Up To 30%</span>
-            <h3 className="mt-3 mb-4">Ride <span className="orange-text">More</span> Save <span className="orange-text">More.</span></h3>
+      {/* Pricing Section */}
+      <section className="pricing-section">
+        <Container>
+          <h2 className="d-flex justify-content-center align-items-center" style={{gap: "5px"}}>
+            Our <span style={{color: "#ff6b35"}}>Rates</span>
+          </h2>
+          
+          <div className="container mt-4">
+            <Row className="justify-content-center">
+              {/* Left Pricing Card */}
+              <Col lg={4} md={6} className="col-12 mb-4">
+                <div className="pricing-card">
+                  <span className="discount-badge">Save Up To 30%</span>
+                  <h3 className="mt-3 mb-4">Ride <span className="orange-text">More</span> Save <span className="orange-text">More.</span></h3>
 
-            {discounts.map((item, index) => (
-              <div key={index} className="pricing-row">
-                <span>{item.days}</span>
-                <span className="discount-pill">{item.discount}</span>
-              </div>
-            ))}
-          </div>
-        </Col>
-
-        {/* Right Feature Cards */}
-        <Col lg={8} md={6} className="col-12">
-          <Row>
-            {features.map((feature, index) => (
-              <Col md={6} className="col-12 mb-4" key={index}>
-                <div className="feature-card">
-                  <div className="feature-icon-service">
-                    {feature.icon}
-                  </div>
-                  <h5 style={{textAlign: 'start'}}>{feature.title}</h5>
-                  <p style={{textAlign: 'start'}}>{feature.description}</p>
+                  {discounts.map((item, index) => (
+                    <div key={index} className="pricing-row">
+                      <span>{item.days}</span>
+                      <span className="discount-pill">{item.discount}</span>
+                    </div>
+                  ))}
                 </div>
               </Col>
-            ))}
-          </Row>
-        </Col>
-      </Row>
-    </div>
-  </Container>
-</section>
+
+              {/* Right Feature Cards */}
+              <Col lg={8} md={6} className="col-12">
+                <Row>
+                  {features.map((feature, index) => (
+                    <Col md={6} className="col-12 mb-4" key={index}>
+                      <div className="feature-card">
+                        <div className="feature-icon-service">
+                          {feature.icon}
+                        </div>
+                        <h5 style={{textAlign: 'start'}}>{feature.title}</h5>
+                        <p style={{textAlign: 'start'}}>{feature.description}</p>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </Col>
+            </Row>
+          </div>
+        </Container>
+      </section>
     </>
   );
 };

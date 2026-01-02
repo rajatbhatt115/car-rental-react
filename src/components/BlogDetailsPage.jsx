@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Badge, Spinner, Alert } from 'react-bootstrap';
 import { Link, useParams } from 'react-router-dom';
 import { FaStar, FaCalendar, FaUser, FaComments, FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../api/api';
 
 const BlogDetailsPage = () => {
   const { id } = useParams();
@@ -18,9 +18,6 @@ const BlogDetailsPage = () => {
     rating: 5
   });
 
-  // API configuration
-  const API_BASE_URL = 'http://localhost:3001';
-
   // Mock data for blog
   const mockBlog = {
     id: 1,
@@ -29,6 +26,7 @@ const BlogDetailsPage = () => {
     author: "Admin",
     commentsCount: 3,
     image: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800",
+    excerpt: "We've added 10 new luxury vehicles to our fleet to serve you better.",
     content: `
       <p>Renting a car gives you complete freedom to explore your destination at your own pace.
       However, many travellers end up paying extra due to small mistakes or missing
@@ -38,73 +36,7 @@ const BlogDetailsPage = () => {
       <p>Always compare rental companies before booking. Look for offers that include insurance
       coverage, unlimited mileage, and 24/7 customer assistance. Paying attention to these
       details protects you from unnecessary charges later.</p>
-      
-      <p>Before driving away, inspect the car properly. Check the tyres, fuel level, headlights,
-      brakes, and overall condition. Capture a few photos or a short video of the vehicle—this
-      simple step protects you from false damage claims at return.</p>
-      
-      <p>Choosing the right vehicle is extremely important. For long family trips, an SUV or sedan
-      provides comfort. For city rides, choose a compact car to save on fuel. Select a car
-      based on your journey, not just the lowest price.</p>
-      
-      <p>Lastly, return the car on time and refill the tank as per policy. Late returns or low
-      fuel levels often lead to extra charges. These simple habits ensure your rental
-      experience remains smooth and enjoyable.</p>
     `
-  };
-
-  const mockBlogs = [
-    {
-      id: 1,
-      title: "5 Essential Checks Before Renting a Car",
-      date: "21/05/2023",
-      image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=80"
-    },
-    {
-      id: 2,
-      title: "How to Reduce Costs on Long Road Trips",
-      date: "16/07/2023",
-      image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=80"
-    },
-    {
-      id: 3,
-      title: "Best Cars for Comfortable Family Travel",
-      date: "22/09/2023",
-      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=80"
-    },
-    {
-      id: 4,
-      title: "Why Self-Drive Cars Are Trending in 2024",
-      date: "18/01/2024",
-      image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=80"
-    },
-    {
-      id: 5,
-      title: "Ways to Keep Your Rental Car Damage-Free",
-      date: "19/04/2024",
-      image: "https://images.unsplash.com/photo-1550355291-bbee04a92027?w=80"
-    }
-  ];
-
-  // API functions
-  const getBlogById = async (blogId) => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/blogs/${blogId}`);
-      return { data: response.data };
-    } catch (error) {
-      console.error('Error fetching blog:', error);
-      return { data: mockBlog };
-    }
-  };
-
-  const getBlogs = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/blogs`);
-      return { data: response.data };
-    } catch (error) {
-      console.error('Error fetching blogs:', error);
-      return { data: mockBlogs };
-    }
   };
 
   useEffect(() => {
@@ -113,19 +45,19 @@ const BlogDetailsPage = () => {
         setLoading(true);
         
         // Fetch specific blog
-        const blogResponse = await getBlogById(id);
-        setBlog(blogResponse.data);
+        const blogResponse = await api.getBlogById(id);
+        setBlog(blogResponse.data || mockBlog);
         
         // Fetch all blogs for sidebar
-        const blogsResponse = await getBlogs();
-        setBlogs(blogsResponse.data);
+        const blogsResponse = await api.getBlogs();
+        setBlogs(blogsResponse.data || []);
         
         setError(null);
       } catch (err) {
         console.error('Error fetching blog data:', err);
         setError('Failed to load blog details. Using local data.');
         setBlog(mockBlog);
-        setBlogs(mockBlogs);
+        setBlogs([]);
       } finally {
         setLoading(false);
       }
@@ -252,21 +184,8 @@ const BlogDetailsPage = () => {
                     
                     <div 
                       className="blog-content mt-4"
-                      dangerouslySetInnerHTML={{ __html: blog.content }}
+                      dangerouslySetInnerHTML={{ __html: blog.content || blog.excerpt }}
                     />
-                    
-                    <div className="blog-images">
-                      <img 
-                        src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400" 
-                        alt="Car Interior" 
-                        className="img-fluid"
-                      />
-                      <img 
-                        src="https://images.unsplash.com/photo-1485291571150-772bcfc10da5?w=400" 
-                        alt="Car Exterior" 
-                        className="img-fluid"
-                      />
-                    </div>
                     
                     {/* Author Box */}
                     <div className="author-box">
@@ -395,8 +314,6 @@ const BlogDetailsPage = () => {
           </Row>
         </Container>
       </section>
-
-      
     </>
   );
 };
