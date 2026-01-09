@@ -391,6 +391,11 @@ body {
     font-weight: bold;
 }
 
+.btn-white-text
+{
+    color: #ffffff;
+}
+
 .pricing-row {
     display: flex;
     justify-content: space-between;
@@ -1615,3 +1620,4 @@ footer {
   }
 
 }
+

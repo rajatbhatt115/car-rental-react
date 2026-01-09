@@ -101,6 +101,46 @@ const HomePage = () => {
     { icon: <FaCheckCircle size="2em" />, title: "Sit back & Relax", description: "Enjoy your comfortable ride" }
   ];
 
+  const handleRazorpayPayment = (car, type) => {
+    if (!window.Razorpay) {
+      alert("Razorpay SDK not loaded");
+      return;
+    }
+
+    const amount =
+      type === "hour"
+        ? car.hourlyRate * 100
+        : car.dailyRate * 100;
+
+    const options = {
+      key: "rzp_test_1DP5mmOlF5G5ag",
+      amount: amount,
+      currency: "INR",
+      name: "Car Rentals",
+      description:
+        type === "hour"
+          ? `${car.type} - Hourly Booking`
+          : `${car.type} - Daily Booking`,
+      handler: function (response) {
+        alert("Payment Successful 🎉");
+        console.log(response);
+      },
+      prefill: {
+        name: "Test User",
+        email: "test@gmail.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#f9b233",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+
+
   // Icon mapping for home services
   const homeServiceIcons = {
     car: <FaCar />,
@@ -112,7 +152,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         const [
           carsResponse,
           testimonialsResponse,
@@ -193,10 +233,30 @@ const HomePage = () => {
                   <img src={car.image} alt={`${car.type} Car`} className="car-image" />
                   <h4>{car.type}</h4>
                   <p>{car.description}</p>
+
                   <div className="price-box">
-                    <div style={{ color: 'black' }}> Per Hour: <span className="price">₹{car.hourlyRate}/-</span></div>
-                    <div style={{ color: 'black' }} className="mt-2"> Per Day: <span className="price">₹{car.dailyRate}/-</span></div>
-                    <Button as={Link} to={`/booking?carId=${car.id || index + 1}`} className="btn btn-primary mt-3 w-100">Book Now</Button>
+                    <div style={{ color: 'black' }}>
+                      Per Hour: <span className="price">₹{car.hourlyRate}/-</span>
+                    </div>
+
+                    <div style={{ color: 'black' }} className="mt-2">
+                      Per Day: <span className="price">₹{car.dailyRate}/-</span>
+                    </div>
+
+                    {/* ✅ CORRECT BUTTON */}
+                    <Button
+                      className="btn mt-3 w-100"
+                      onClick={() => handleRazorpayPayment(car, "hour")}
+                    >
+                      Book Per Hour
+                    </Button>
+                    <Button
+                      className="btn mt-2 w-100"
+                      onClick={() => handleRazorpayPayment(car, "day")}
+                    >
+                      Book Per Day
+                    </Button>
+
                   </div>
                 </div>
               </Col>
@@ -214,7 +274,6 @@ const HomePage = () => {
               <p>We provide the best luxury and economy cars for your comfortable journey. Our fleet includes a
                 wide range of vehicles to suit every need and budget. Experience premium service with
                 professional drivers and well-maintained vehicles.</p>
-              <Button as={Link} to="/about" className="btn btn-light mt-3 custom-white-btn">Learn More</Button>
             </Col>
             <Col lg={6}>
               <img src="/img/img2.png" alt="Map Illustration" className="img-fluid" />
@@ -293,10 +352,10 @@ const HomePage = () => {
           <Row className="justify-content-center align-items-center">
             {partners.map((partner, index) => (
               <Col md={2} xs={4} className="mb-3" key={index}>
-                <img 
-                  src={partner.logo} 
+                <img
+                  src={partner.logo}
                   alt={partner.name}
-                  className="img-fluid grayscale logo-small" 
+                  className="img-fluid grayscale logo-small"
                 />
               </Col>
             ))}

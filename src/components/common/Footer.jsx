@@ -13,6 +13,11 @@ const Footer = () => {
     alert('Thank you for subscribing!');
   };
 
+  // Function to scroll to top when navigating
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <footer className="text-white">
       <Container>
@@ -38,15 +43,44 @@ const Footer = () => {
             <div className="text-start">
               <h5>Quick Links</h5>
               <div className="footer-links mt-3">
-                <Link to="/" className="text-white d-block mb-2 text-decoration-none">Home</Link>
-                <Link to="/about" className="text-white d-block mb-2 text-decoration-none">About</Link>
-                <Link to="/services" className="text-white d-block mb-2 text-decoration-none">Services</Link>
-                <Link to="/cars" className="text-white d-block mb-2 text-decoration-none">Our Cars</Link>
-                <Link to="/blogs" className="text-white d-block mb-2 text-decoration-none">Blogs</Link>
+                <Link 
+                  to="/" 
+                  onClick={scrollToTop}
+                  className="text-white d-block mb-2 text-decoration-none"
+                >
+                  Home
+                </Link>
+                <Link 
+                  to="/about" 
+                  onClick={scrollToTop}
+                  className="text-white d-block mb-2 text-decoration-none"
+                >
+                  About
+                </Link>
+                <Link 
+                  to="/services" 
+                  onClick={scrollToTop}
+                  className="text-white d-block mb-2 text-decoration-none"
+                >
+                  Services
+                </Link>
+                <Link 
+                  to="/cars" 
+                  onClick={scrollToTop}
+                  className="text-white d-block mb-2 text-decoration-none"
+                >
+                  Our Cars
+                </Link>
+                <Link 
+                  to="/blogs" 
+                  onClick={scrollToTop}
+                  className="text-white d-block mb-2 text-decoration-none"
+                >
+                  Blogs
+                </Link>
               </div>
             </div>
           </Col>
-
 
           <Col lg={4} md={6} className="mb-4">
             <h5>Newsletter</h5>

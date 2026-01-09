@@ -136,10 +136,10 @@ const CarsPage = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Try to fetch from API first
       const response = await api.getFilterCars();
-      
+
       if (response.data && response.data.length > 0) {
         setCars(response.data);
         setFilteredCars(response.data);
@@ -160,6 +160,45 @@ const CarsPage = () => {
     }
   };
 
+  const handleRazorpayPayment = (car, type) => {
+    if (!window.Razorpay) {
+      alert("Razorpay SDK not loaded");
+      return;
+    }
+
+    const amount =
+      type === "hour"
+        ? car.hourlyRate * 100
+        : car.dailyRate * 100;
+
+    const options = {
+      key: "rzp_test_1DP5mmOlF5G5ag", // replace with your Razorpay test/live key
+      amount: amount,
+      currency: "INR",
+      name: "Car Rentals",
+      description:
+        type === "hour"
+          ? `${car.type} - Hourly Booking`
+          : `${car.type} - Daily Booking`,
+      handler: function (response) {
+        alert("Payment Successful 🎉");
+        console.log(response);
+      },
+      prefill: {
+        name: "Test User",
+        email: "test@gmail.com",
+        contact: "9999999999",
+      },
+      theme: {
+        color: "#ff6633",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
+
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prev => ({
@@ -171,9 +210,9 @@ const CarsPage = () => {
   const applyFilters = async () => {
     try {
       setLoading(true);
-      
+
       const hasFilters = Object.values(filters).some(value => value !== '');
-      
+
       if (hasFilters) {
         try {
           // Try API search first
@@ -201,13 +240,13 @@ const CarsPage = () => {
     let filtered = [...cars];
 
     if (filters.category) {
-      filtered = filtered.filter(car => 
+      filtered = filtered.filter(car =>
         car.category.toLowerCase().includes(filters.category.toLowerCase())
       );
     }
 
     if (filters.type) {
-      filtered = filtered.filter(car => 
+      filtered = filtered.filter(car =>
         car.type.toLowerCase().includes(filters.type.toLowerCase())
       );
     }
@@ -259,7 +298,7 @@ const CarsPage = () => {
         <Container>
           <Row className="align-items-center banner-gap">
             <Col lg={6}>
-              <img src="/img/banner_our_ cars.png" alt="Our Cars" className="img-fluid" style={{ width: 'auto' , height: '382px'}} />
+              <img src="/img/banner_our_ cars.png" alt="Our Cars" className="img-fluid" style={{ width: 'auto', height: '382px' }} />
             </Col>
             <Col lg={6}>
               <h1>Our <span className="highlight">Cars</span></h1>
@@ -270,7 +309,7 @@ const CarsPage = () => {
               <nav className="breadcrumb-custom mt-3">
                 <Link to="/" className="text-white text-decoration-none">Home</Link>
                 <span className="mx-2 text-white">::</span>
-                <span style={{color: '#ff6b35'}}>Our Cars</span>
+                <span style={{ color: '#ff6b35' }}>Our Cars</span>
               </nav>
             </Col>
           </Row>
@@ -281,22 +320,22 @@ const CarsPage = () => {
       <section>
         <Container className="rates-section">
           <h1 className="page-title">Flexible <span className="orange-text">Rates</span></h1>
-          
+
           {error && (
             <Alert variant="warning" className="mb-3">
               {error}
             </Alert>
           )}
-          
+
           <Row>
             {/* Filter Sidebar */}
             <Col lg={3} md={4} className="mb-4">
               <div className="filter-sidebar">
                 <h4>Filter Vehicles</h4>
-                
+
                 <div className="mb-3">
                   <label className="form-label">Category</label>
-                  <Form.Select 
+                  <Form.Select
                     name="category"
                     value={filters.category}
                     onChange={handleFilterChange}
@@ -310,7 +349,7 @@ const CarsPage = () => {
 
                 <div className="mb-3">
                   <label className="form-label">Vehicle Type</label>
-                  <Form.Select 
+                  <Form.Select
                     name="type"
                     value={filters.type}
                     onChange={handleFilterChange}
@@ -324,7 +363,7 @@ const CarsPage = () => {
 
                 <div className="mb-3">
                   <label className="form-label">Seats</label>
-                  <Form.Select 
+                  <Form.Select
                     name="seats"
                     value={filters.seats}
                     onChange={handleFilterChange}
@@ -338,7 +377,7 @@ const CarsPage = () => {
 
                 <div className="mb-3">
                   <label className="form-label">Bags</label>
-                  <Form.Select 
+                  <Form.Select
                     name="bags"
                     value={filters.bags}
                     onChange={handleFilterChange}
@@ -352,7 +391,7 @@ const CarsPage = () => {
 
                 <div className="mb-3">
                   <label className="form-label">Max Price per Hour (₹)</label>
-                  <Form.Control 
+                  <Form.Control
                     type="number"
                     name="maxPrice"
                     value={filters.maxPrice}
@@ -363,17 +402,17 @@ const CarsPage = () => {
                 </div>
 
                 <div className="d-grid gap-2">
-                  <Button 
-                    style={{backgroundColor: '#ff6b35', border: 'none', width: '100%'}} 
-                    onClick={applyFilters} 
+                  <Button
+                    style={{ backgroundColor: '#ff6b35', border: 'none', width: '100%' }}
+                    onClick={applyFilters}
                     disabled={loading}
                   >
                     {loading ? 'Applying...' : 'Apply Filters'}
                   </Button>
-                  <Button 
-                    variant="outline-secondary" 
+                  <Button
+                    variant="outline-secondary"
                     onClick={resetFilters}
-                    style={{width: '100%'}}
+                    style={{ width: '100%' }}
                   >
                     Reset Filters
                   </Button>
@@ -389,11 +428,11 @@ const CarsPage = () => {
                   <p className="mt-3">Loading cars...</p>
                 </div>
               ) : filteredCars.length === 0 ? (
-                <div id="noResults" className="no-results" style={{display: 'block'}}>
+                <div id="noResults" className="no-results" style={{ display: 'block' }}>
                   <p className="text-center">No vehicles found matching your filters.</p>
-                  <Button 
-                    variant="outline-warning" 
-                    onClick={resetFilters} 
+                  <Button
+                    variant="outline-warning"
+                    onClick={resetFilters}
                     className="mt-3 d-block mx-auto"
                   >
                     Reset Filters
@@ -405,9 +444,9 @@ const CarsPage = () => {
                     <Col lg={4} md={6} key={car.id} className="mb-4">
                       <div className="car-card">
                         <span className="category-badge">{car.category}</span>
-                        <img 
-                          src={car.image} 
-                          alt={car.type} 
+                        <img
+                          src={car.image}
+                          alt={car.type}
                           className="car-image-filter"
                           onError={(e) => {
                             e.target.src = "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&auto=format&fit=crop";
@@ -426,25 +465,42 @@ const CarsPage = () => {
                               <span className="price-value">₹{car.dailyRate}/-</span>
                             </div>
                           </div>
-                          <Button 
-                            as={Link} 
-                            to={`/booking?carId=${car.id}`} 
-                            className="book-btn"
-                            style={{
-                              backgroundColor: '#ff6633',
-                              border: 'none',
-                              padding: '12px',
-                              borderRadius: '8px',
-                              width: 'calc(100% - 40px)',
-                              margin: '0 20px 20px 20px',
-                              fontWeight: '600',
-                              fontSize: '1.1rem',
-                              cursor: 'pointer',
-                              transition: 'background 0.3s ease'
-                            }}
-                          >
-                            Book Now
-                          </Button>
+                          <div className="d-grid gap-2 mt-2">
+                            <Button
+                              className="book-btn2"
+                              style={{
+                                backgroundColor: '#ff6633',
+                                border: 'none',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                fontWeight: '400',
+                                fontSize: '1.0rem',
+                                cursor: 'pointer',
+                                transition: 'background 0.3s ease'
+                              }}
+                              onClick={() => handleRazorpayPayment(car, 'hour')}
+                            >
+                              Book Per Hour
+                            </Button>
+                            <Button
+                              className="book-btn2"
+                              style={{
+                                backgroundColor: '#ff3300',
+                                border: 'none',
+                                padding: '12px',
+                                borderRadius: '8px',
+                                fontWeight: '400',
+                                fontSize: '1.0rem',
+                                cursor: 'pointer',
+                                transition: 'background 0.3s ease',
+                                marginbottom: '0px'
+                              }}
+                              onClick={() => handleRazorpayPayment(car, 'day')}
+                            >
+                              Book Per Day
+                            </Button>
+                          </div>
+
                         </div>
                       </div>
                     </Col>
