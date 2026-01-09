@@ -31,9 +31,16 @@ const api = {
    // Home Services (Simple icons wali)
   getHomeServices: () => axios.get(`${API_BASE_URL}/homeServices`),
 
+   // Company History
+  getCompanyHistory: () => axios.get(`${API_BASE_URL}/companyHistory`),
+
   // Services Page Services (Numbered wali)
   getServices: () => axios.get(`${API_BASE_URL}/services`),
   getServiceById: (id) => axios.get(`${API_BASE_URL}/services/${id}`),
+
+    // Rates for Services Page
+  getRates: () => axios.get(`${API_BASE_URL}/rates`),
+  getFeatures: () => axios.get(`${API_BASE_URL}/features`),
 
   // Stats
   getStats: () => Promise.resolve({

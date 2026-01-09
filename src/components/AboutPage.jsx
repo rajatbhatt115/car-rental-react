@@ -5,40 +5,34 @@ import { FaBullseye, FaLightbulb, FaHandHoldingHeart, FaChevronRight } from 'rea
 import api from '../api/api';
 
 const AboutPage = () => {
-  const [team, setTeam] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [companyHistory, setCompanyHistory] = useState([]);
 
-  const timeline = [
-    { year: '2020', desc: 'Founded CarRental with just 10 cars and a small but passionate team.' },
-    { year: '2021', desc: 'Expanded services to 3 major cities with 24/7 online booking support.' },
-    { year: '2022', desc: 'Introduced luxury vehicles and business travel packages.' },
-    { year: '2023', desc: 'Crossed 1 million happy customers milestone across India.' },
-    { year: '2024', desc: 'Launched eco-friendly electric car rentals for sustainable travel.' }
-  ];
+  // Remove team-related state and useEffect
 
   useEffect(() => {
-    const fetchTeam = async () => {
+    const fetchCompanyHistory = async () => {
       try {
         setLoading(true);
-        const response = await api.getTeam();
-        setTeam(response.data || []);
+        const response = await api.getCompanyHistory();
+        setCompanyHistory(response.data || []);
         setError(null);
       } catch (err) {
-        console.error('Error fetching team:', err);
-        setError('Failed to load team data.');
-        setTeam([]);
+        console.error('Error fetching company history:', err);
+        setError('Failed to load company history data.');
+        setCompanyHistory([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTeam();
+    fetchCompanyHistory();
   }, []);
 
   return (
     <>
-      {/* Hero Section */}
+      {/* Hero Section - No changes */}
       <section className="hero-section-about">
         <Container>
           <Row className="align-items-center banner-gap">
@@ -62,7 +56,7 @@ const AboutPage = () => {
         </Container>
       </section>
 
-      {/* Trusted Service Section */}
+      {/* Trusted Service Section - No changes */}
       <section className="trusted-service">
         <Container>
           <h2>Our <span className="highlight">Trusted</span> Service</h2>
@@ -122,23 +116,32 @@ const AboutPage = () => {
         </Container>
       </section>
 
-      {/* Company History Section */}
+      {/* Company History Section - Now Dynamic */}
       <section className="history-section">
         <Container>
           <h2>Our <span className="highlight">Company History</span></h2>
 
-          <div className="timeline">
-            {timeline.map((item, index) => (
-              <div key={index} className="timeline-card">
-                <div className="timeline-year">{item.year}</div>
-                <p>{item.desc}</p>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-4">
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2">Loading company history...</p>
+            </div>
+          ) : error ? (
+            <Alert variant="warning">{error}</Alert>
+          ) : (
+            <div className="timeline">
+              {companyHistory.map((item, index) => (
+                <div key={item.id || index} className="timeline-card">
+                  <div className="timeline-year">{item.year}</div>
+                  <p>{item.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </Container>
       </section>
 
-      {/* Mission Vision Values */}
+      {/* Mission Vision Values - No changes */}
       <section className="mvv-section">
         <Container>
           <Row>
@@ -181,12 +184,6 @@ const AboutPage = () => {
           </Row>
         </Container>
       </section>
-
-      {error && (
-        <Container>
-          <Alert variant="warning">{error}</Alert>
-        </Container>
-      )}
     </>
   );
 };

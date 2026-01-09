@@ -58,6 +58,69 @@
     }
   ],
 
+   "companyHistory": [
+    {
+      "id": 1,
+      "year": "2020",
+      "description": "Founded CarRental with just 10 cars and a small but passionate team."
+    },
+    {
+      "id": 2,
+      "year": "2021",
+      "description": "Expanded services to 3 major cities with 24/7 online booking support."
+    },
+    {
+      "id": 3,
+      "year": "2022",
+      "description": "Introduced luxury vehicles and business travel packages."
+    },
+    {
+      "id": 4,
+      "year": "2023",
+      "description": "Crossed 1 million happy customers milestone across India."
+    },
+    {
+      "id": 5,
+      "year": "2024",
+      "description": "Launched eco-friendly electric car rentals for sustainable travel."
+    }
+  ],
+
+   "rates": [
+    { "id": 1, "days": "1-2 Days", "discount": "2% Discount" },
+    { "id": 2, "days": "2-5 Days", "discount": "5% Discount" },
+    { "id": 3, "days": "6-15 Days", "discount": "10% Discount" },
+    { "id": 4, "days": "10-15 Days", "discount": "15% Discount" },
+    { "id": 5, "days": "Above 15 Days", "discount": "20% Discount" }
+  ],
+  
+  "features": [
+    {
+      "id": 1,
+      "icon": "FaBan",
+      "title": "Free Cancellation",
+      "description": "Pellente ornare sem urpibur blandit tempus lacinia quam venenatis nulla metus auctor."
+    },
+    {
+      "id": 2,
+      "icon": "FaShieldAlt",
+      "title": "Theft Protection",
+      "description": "Pellente ornare sem urpibur blandit tempus lacinia quam venenatis nulla metus auctor."
+    },
+    {
+      "id": 3,
+      "icon": "FaMapMarkerAlt",
+      "title": "GPS on Every Vehicle",
+      "description": "Pellente ornare sem urpibur blandit tempus lacinia quam venenatis nulla metus auctor."
+    },
+    {
+      "id": 4,
+      "icon": "FaGasPump",
+      "title": "Refueling Policy",
+      "description": "Pellente ornare sem urpibur blandit tempus lacinia quam venenatis nulla metus auctor."
+    }
+  ],
+
    "filterCars": [
     {
       "id": 1,
